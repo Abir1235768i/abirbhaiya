@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨AbirBhai.com ✨</title>
+  <!-- GSAP for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <!-- Particles.js for background effects -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <!-- Three.js for 3D effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #ff69b4;
+      --secondary-color: #4a90e2;
+      --text-color: #333;
+      --bg-color: #fce4ec;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      z-index: 1;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px) rotateX(5deg);
+    }
+
+    h1 {
+      font-size: 3em;
+      color: var(--primary-color);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      margin-bottom: 1rem;
+      animation: rainbow 5s infinite;
+    }
+
+    @keyframes rainbow {
+      0% { color: #ff69b4; }
+      25% { color: #4a90e2; }
+      50% { color: #50c878; }
+      75% { color: #ffd700; }
+      100% { color: #ff69b4; }
+    }
+
+    .input-group {
+      margin: 2rem 0;
+      position: relative;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      box-shadow: 0 0 15px var(--primary-color);
+    }
+
+    .button {
+      padding: 1rem 2rem;
+      font-size: 1.2em; 
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .message, .poem {
+      font-size: 1.5em;
+      margin: 2rem 0;
+      color: var(--text-color);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .cake-container {
+      margin: 2rem 0;
+      perspective: 1000px;
+    }
+
+    #cake-canvas {
+      width: 100%;
+      height: 300px;
+      border-radius: 10px;
+    }
+
+    .balloon {
+      position: fixed;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .wishes-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .wish-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transform: scale(0);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 1rem;
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .button {
+        padding: 0.8rem 1.6rem;
+        font-size: 1em;
+      }
+    }
+
+    .timer {
+      font-size: 2em;
+      color: var(--primary-color);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      margin: 1rem 0;
+    }
+
+    .hearts {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: var(--primary-color);
+      transform: rotate(45deg);
+      animation: heartFloat 4s ease-in infinite;
+    }
+
+    @keyframes heartFloat {
+      0% { transform: translateY(0) rotate(45deg); opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(45deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div class="hearts"></div>
+  
+  <div class="container">
+    <div class="card">
+      <h1>✨ খাদিজা!! <h6> তোমার প্রিয় মানুষটির নাম লিখ⤵️</h6></h1>
+      <div class="input-group">
+        <input type="text" id="nameInput" placeholder="Enter here...">
+      </div>
+      <button class="button" onclick="startCelebration()">🎉 click here Khadiza! 🎉</button><br><br>
+      <button class="button"><a href="https://abir1235768i.github.io/Test/">🎉 শুধু  তোমার জন্য🎉</a></button>
+      <div class="timer" id="timer"></div>
+      <div class="message" id="message"></div>
+      <div class="poem" id="poem"></div>
+      <div class="cake-container">
+        <canvas id="cake-canvas"></canvas>
+      </div>
+      
+       
+     
+      <div class="wishes-container" id="wishes"></div>
+    </div>
+  </div>
+
+<script>
+  const specialMessages = [
+    "আজ আমার দিন, তবুও নেই সেই হাসি,তুমি নেই পাশে, মন শুধু খোঁজে ভালোবাসি।তুমি ছাড়া সবই যেন নিরব নীরবতা,তোমার ছোঁয়ায় ফিরে পাই জীবনের পূর্ণতা। 😶",
+    "ভালোবাসার মানুষ, তুমি নেই এই দিনে,শূন্যতা ভরা মনে, আশা ম্লান চিহ্নে।তবুও ভাবি, হয়তো কোনো এক আকাশে,তুমি আছো ভালোবাসা নিয়ে পাশে।হৃদয়ের আঙিনায় একা বসে চেয়ে,যদি আবার দেখা হয় এই পথের শেষে,তবু আজ আমার জন্মদিনের গান,নিঃসঙ্গ হৃদয়, স্মৃতির রঙ্গিন প্রাণ।",
+    "প্রিয় দিনেও শূন্যতা মোর সঙ্গী হয়,তোমার স্মৃতি হৃদয়ে ব্যথার ঢেউ বয়।ফিরে আসো প্রিয়, আবার প্রাণে বেঁধে রাখো,এই একাকীত্বের দহন, যেন তোমাতে মুছিয়ে যাক।",
+    "অনুভূতির এই প্রহরে তুমি নেই পাশে,তোমায় ঘিরে জাগে মনের অজস্র ভালোবাসার ভাষে।তোমার জন্য প্রতীক্ষা, প্রতিটি নিঃশ্বাসে,এই অনুভবেই কাটে একলা মনের নিভৃত আশ্বাসে।",
+    "চাঁদের আলো এসে পড়েছে, নদীর জলে ঝলমল,কখনও হারায় কোথায়, যেন এক অসীম ভ্রমণ।তোমার স্মৃতির মিষ্টতা, বিষাদের মাঝে লুকিয়ে,তুমি আসলে ভরে যাবে, নিঃসঙ্গতা দূর হয়ে।",
+    "এতো বছরের উচ্ছ্বাস, আজ কেন বিষাদ?তোমার হাসির ছোঁয়ায় ছিল প্রাণের আবহাদ।জন্মদিনের কেক কেটে, চোখের জল মুছি,প্রিয় মানুষের স্নেহ থেকে কেন যে দূরে আছি।",
+    "খাদিজা তুমি, জীবনের প্রথম সঙ্গী,নবী মোহাম্মদের হৃদয়ে তোমার ছিল একমাত্র রঙ্গী।তুমি তো অরুণোদয়ের আলো,ভালোবাসার দিশারী, সাহসের রত্নখণ্ড।মক্কার রোদে তুমি, ছিলেনা তোমার মতো কারো,শান্তি ও সহানুভূতির আলো, তুমি ছিলে উজ্জ্বল নক্ষত্র।যখন বিপদে নিপতিত, তুমি ছিলে এক মহান শক্তি,তোমার স্নেহে ভরে উঠত, নবীর প্রতিটি লক্ষ্যে নীতি।",
+    "মৌন রজনীতে, এই প্রণয়ের সুর,দুই হৃদয় জানে, এটি নিতান্তই দুর্বল।তবুও আমরা স্বপ্ন দেখি, হৃদয়ে লুকানো,অসীম এই ভালোবাসা, হয়তো থাকবে অনাদিকাল।"
+  ];
+
+  let countdown = 30;
+
+  function startCelebration() {
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) {
+      gsap.to('.card', {
+        x: [-10, 10, -10, 10, 0],
+        duration: 0.5,
+        ease: 'power1.inOut'
+      });
+      return;
+    }
+
+    document.getElementById('timer').textContent = countdown;
+
+    const interval = setInterval(() => {
+      countdown--;
+      document.getElementById('timer').textContent = countdown;
+
+      if (countdown <= 0) {
+        clearInterval(interval);
+        revealSurprise(name);
+      }
+    }, 1000);
+  }
+
+  function revealSurprise(name) {
+    // Trigger confetti
+    confetti({
+      particleCount: 500,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+
+    // Animate message
+    const message = document.getElementById('message');
+    message.style.display = 'block';
+    message.textContent = `🎉 শুভ জন্মদিন dear খাদিজা, ${name} এর পক্ষ থেকে! 🎉`;
+
+    gsap.to(message, {
+      opacity: 1,
+      y: 0,
+      duration: 1,
+      ease: 'back.out'
+    });
+
+    // Show specific message for "Abir" or random message for others
+    const poem = document.getElementById('poem');
+    poem.style.display = 'block';
+    if (name.toLowerCase() === "abir") {
+      poem.textContent = " প্রিয় মানুষ নই বলে কবিতা লিখতে পারিনি 😩 হয়তো একটি ফুল, হতে পারে হাসি,তবে এই প্রতিটি রঙে, লুকিয়ে আছে রঙিন নেশা।শুধু বোঝা, না বোঝা, সময়ই বুঝাবে,কখন বুঝবে তুমি, হৃদয় এ মেলাবে।!! আর কি লিখি পাইনা যে ভেবে 😀😃";
+    } else {
+      poem.textContent = specialMessages[Math.floor(Math.random() * specialMessages.length)];
+    }
+
+    gsap.to(poem, {
+      opacity: 1,
+      y: 0,
+      duration: 1,
+      delay: 0.5,
+      ease: 'back.out'
+    });
+
+    // Show wishes button
+    document.getElementById('wishesBtn').style.display = 'block';
+
+    // Initialize 3D cake
+    initCake();
+  }
+
+  function showWishes() {
+    const wishesContainer = document.getElementById('wishes');
+    wishesContainer.innerHTML = '';
+
+    specialMessages.forEach((message, index) => {
+      const wishCard = document.createElement('div');
+      wishCard.classList.add('wish-card');
+      wishCard.textContent = message;
+
+      wishesContainer.appendChild(wishCard);
+
+      gsap.to(wishCard, {
+        scale: 1,
+        duration: 0.5,
+        delay: index * 0.2,
+        ease: 'back.out'
+      });
+    });
+
+    // More confetti
+    confetti({
+      particleCount: 1000,
+      spread: 90,
+      origin: { y: 0.6 }
+    });
+  }
+
+  // Simple 3D cake animation using Three.js
+  function initCake() {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, 2, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({
+      canvas: document.getElementById('cake-canvas'),
+      alpha: true
+    });
+
+    const geometry = new THREE.CylinderGeometry(1, 1, 1, 32);
+    const material = new THREE.MeshPhongMaterial({ color: 0xff69b4 });
+    const cake = new THREE.Mesh(geometry, material);
+
+    scene.add(cake);
+
+    const light = new THREE.PointLight(0xffffff, 1, 100);
+    light.position.set(5, 5, 5);
+    scene.add(light);
+
+    camera.position.z = 5;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      cake.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  }
+</script>
+</body>
+</html>
